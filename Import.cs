@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
@@ -12,10 +12,8 @@ public class Import {
         switch (format) {
             case FileFormat.Xml:
                 XmlSerializer serializer = new XmlSerializer(typeof(Ship));
-                using (Stream reader = new FileStream(filePath, FileMode.Open)) {
-                    s = (Ship)serializer.Deserialize(reader);
-                }
-
+                return (Ship)serializer.Deserialize(new StringReader(File.ReadAllText(filePath)));
+                
                 break;
         }
 

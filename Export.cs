@@ -13,18 +13,21 @@ public enum FileFormat {
 }
 
 public class Export {
-    public static void ExportShip(FileFormat format, Ship ship) {
-        string dir = $@"/PTI/Ships/{Util.TypeDict[ship.Type]}/{ship.Class}/";
+    public static void ExportShip(FileFormat format, Ship ship, string? filePath) {
+        string dir = filePath ?? $@"/PTI/Ships/{Util.TypeDict[ship.Type]}/{ship.Class}/";
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-        string indent = "    ";
         switch (format) {
             case FileFormat.Xml:
-                StreamWriter stream = new StreamWriter($@"{dir}{ship.Name}.xml");
-                XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true, IndentChars = "    " });
-                // string xml = $"<Ship>\n{indent}<Name>{ship.Name}</Name>\n{indent}<Type>{Util.TypeDict[ship.Type]}</Type>\n{indent}<Class>{ship.Class}</Class>\n{indent}<Dimensions>\n{indent}{indent}<Length>{ship.Dimensions.Length}</Length>\n{indent}{indent}<Width>{ship.Dimensions.Width}</Width>\n{indent}{indent}<Height>{ship.Dimensions.Height}</Height>\n{indent}</Dimensions>\n</Ship>";
-                XmlSerializer serializer = new XmlSerializer(typeof(Ship));
+                StringWriter stream = new StringWriter();
+                XmlTextWriter writer = new XmlTextWriter(stream);
+                writer.Formatting = Formatting.Indented;
 
+                XmlSerializer serializer = new XmlSerializer(typeof(Ship));
                 serializer.Serialize(writer, ship);
+
+                string xml = stream.ToString();
+
+                File.WriteAllText($@"{dir}{ship.Name}.xml", xml);
 
                 break;
             case FileFormat.Json:

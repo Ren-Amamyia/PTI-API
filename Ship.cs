@@ -57,9 +57,6 @@ namespace PTI_API {
     }
 
     public class Ship {
-        [XmlElement(ElementName = "Ship")]
-        
-        [XmlText()]
         public string Name { get; set; }
         public string Class { get; set; }
         public ShipType Type { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 
 namespace PTI_API.Serializing; 
 
@@ -38,6 +39,31 @@ public class XmlSerializing {
                 default:
                     continue;
                 
+            }
+        }
+
+        return s;
+    }
+
+    public async Task<Ship> Deserialize(Stream stream) {
+        Ship s = new Ship();
+        s.Dimensions = new ShipDimensions();
+        XmlReaderSettings settings = new XmlReaderSettings();
+        settings.Async = true;
+
+        using (XmlReader reader = XmlReader.Create(stream, settings)) {
+            while (await reader.ReadAsync()) {
+                switch (reader.NodeType) {
+                    case XmlNodeType.Element:
+                        string value = await reader.GetValueAsync();
+                        if (reader.Name == "Name") s.Name = value;
+                        else if (reader.Name == "Type") s.Type = Util.NameToTypeDict[value];
+                        else if (reader.Name == "Class") s.Class = value;
+                        else if (reader.Name == "Length") s.Dimensions.Length = Int32.Parse(value);
+                        else if (reader.Name == "Width") s.Dimensions.Width = Int32.Parse(value);
+                        else if (reader.Name == "Height") s.Dimensions.Height = Int32.Parse(value);
+                        break;
+                }
             }
         }
 
